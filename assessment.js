@@ -1,119 +1,122 @@
-(function(){
-    'use strict';
+'use strict';
+const userNameInput = document.getElementById('user-name');
+const assessmentButton = document.getElementById('assessment');
+const resultDivided = document.getElementById('result-area');
+const tweetDivided = document.getElementById('tweet-area');
 
-    const userNameInput = document.getElementById('user-name');
-    const assessmentButton = document.getElementById('assessment');
-    const resultDivided = document.getElementById('result-area');
-    const tweetDivided = document.getElementById('tweet-area');
+// カーソル自動設定
+userNameInput.focus();
 
-    // 指定した要素の子供を全て削除する
-    // @param{HTMLElement} element HTMLの要素
-    
-    function removeAllChildren(element){
-      while(element.firstChild){ //　子要素があるかぎり削除
-        // whileはfor文と似ていて繰り返す
-        // while (条件式) {} 条件式が true の間ループを繰り返す
-        // firstChild は子要素の中の先頭のもの
-        // 例 div タグの中に一番最初に h3 があればこれが firstChild
-        element.removeChild(element.firstChild);
-      // }　elementというのはuserNameInput assessmentButton resultDivided tweetDividedの４つだが、
-      // 　　userNameInputとassessmentButtonの子要素はないので、resultDivided tweetDividedの２つ。
-      // 　　特にここではresultDividedの子要素を消す。
-        }
-      }
-    userNameInput.onkeydown = (event) => {
-      if (event.key === 'Enter') {
-        // TODOボタンのonclick()処理を呼び出す
-        assessmentButton.onclick(); 
-      }
-    };
+const answers = [
+  '{userName}のいいところは声です。{userName}の特徴的な声は皆を惹きつけ、心に残ります。',
+  '{userName}のいいところはまなざしです。{userName}に見つめられた人は、気になって仕方がないでしょう。',
+  '{userName}のいいところは情熱です。{userName}の情熱に周りの人は感化されます。',
+  '{userName}のいいところは厳しさです。{userName}の厳しさがものごとをいつも成功に導きます。',
+  '{userName}のいいところは知識です。博識な{userName}を多くの人が頼りにしています。',
+  '{userName}のいいところはユニークさです。{userName}だけのその特徴が皆を楽しくさせます。',
+  '{userName}のいいところは用心深さです。{userName}の洞察に、多くの人が助けられます。',
+  '{userName}のいいところは見た目です。内側から溢れ出る{userName}の良さに皆が気を惹かれます。',
+  '{userName}のいいところは決断力です。{userName}がする決断にいつも助けられる人がいます。',
+  '{userName}のいいところは思いやりです。{userName}に気をかけてもらった多くの人が感謝しています。',
+  '{userName}のいいところは感受性です。{userName}が感じたことに皆が共感し、わかりあうことができます。',
+  '{userName}のいいところは節度です。強引すぎない{userName}の考えに皆が感謝しています。',
+  '{userName}のいいところは好奇心です。新しいことに向かっていく{userName}の心構えが多くの人に魅力的に映ります。',
+  '{userName}のいいところは気配りです。{userName}の配慮が多くの人を救っています。',
+  '{userName}のいいところはその全てです。ありのままの{userName}自身がいいところなのです。',
+  '{userName}のいいところは自制心です。やばいと思ったときにしっかりと衝動を抑えられる{userName}が皆から評価されています。'
+];
 
-    assessmentButton.onclick = () => {
-      const userName = userNameInput.value;
-      if(userName.length === 0){
-        // 名前が空の時は処理を終了する(ガード句)
-        return;
-      }
+/**
+ * 診断処理する関数
+ * @param {string} userName 入力する名前
+ * @return {string} 診断結果
+ */
+function assessment(userName){
+  let userNameNumber = 0;
+  for(let i = 0; i < userName.length; i++){
+    userNameNumber += userName.charCodeAt(i);
+  }
+  const index = userNameNumber % answers.length;
+  return answers[index].replace(/\{userName\}/g, userName);
+}
 
-      //診断結果表示エリアの作成
-      removeAllChildren(resultDivided);
-     
-      const header = document.createElement('h3');
-      header.innerText = '診断結果';
-      // innerTextは文章だけ足して、innerHtmlはHtmlタグを足せる。
-      resultDivided.appendChild(header);
+/**
+ * 子要素を消し初期化
+ * @param {HTMLElement} element 
+ */
+function removeAllChildren(element){
+  while(element.firstChild){
+    element.removeChild(element.firstChild);
+  }
+}
 
-     const paragraph =document.createElement('p');
-     const result = assessment(userName);
-     paragraph.innerText = result;
-     resultDivided.appendChild(paragraph);
+/**
+ * 診断処理を表示
+ * @param {HTMLElement} element
+ * @param {string} result
+ */
+function appendAssessmentResult(element, result){
+  // h3タグを作る
+  const h3 = document.createElement('h3');
+  // タグに診断結果と入れる
+  h3.innerText = '診断結果';
+  // result-areaにh3を表示
+  element.appendChild(h3);
+  // pタグを作る
+  const p = document.createElement('p');
+  p.style.color = "#ffffff";
+  // タグに結果を入れる
+  p.innerText = result;
+  // result-areaにpを表示
+  element.appendChild(p);
+}
 
-     // TODO　ツイートエリアの作成
-     removeAllChildren(tweetDivided);
-     const anchor = document.createElement('a');
-     const hrefValue = 'https://twitter.com/intent/tweet?button_hashtag='
-        +encodeURIComponent('あたなのいいところ')
-        +'&ref_src=twsrc%5Etfw';
+/**
+ * tweetボタン作成
+ * @param {HTMLElement} element
+ * @param {string} result
+ */
+function appendTweetButton(element, result){
+  // aタグ
+  const a = document.createElement('a');
+  const href = 
+    'https://twitter.com/intent/tweet?button_hashtag='
+    + encodeURIComponent('あなたのいいところ')
+    + '&ref_src=twsrc%5Etfw';
+  a.setAttribute('href', href);
+  a.setAttribute('class', "twitter-hashtag-button");
+  a.setAttribute('data-text', result);
+  a.innerText = 'Tweet #あなたのいいところ';
+  element.appendChild(a);
+  // scriptタグ
+  const script = document.createElement('script');
+  script.setAttribute('src', "https://platform.twitter.com/widgets.js");
+  element.appendChild(script);
+}
 
-     anchor.setAttribute('href',hrefValue);
-     anchor.className = 'twitter-hashtag-button'; 
-     anchor.setAttribute('data-text',result);
-     anchor.innerText = 'Tweet #あたなのいいところ';
+/**
+ * ボタンを押したときの処理
+ */
+assessmentButton.onclick = () => {
+  const userName = userNameInput.value;
+  //入力が無いときは何もしない処理
+  if(!userName){
+    return;
+  }
+  removeAllChildren(resultDivided);
+  const result = assessment(userName);
+  appendAssessmentResult(resultDivided, result);
+  removeAllChildren(tweetDivided);
+  appendTweetButton(tweetDivided, result);
+}
 
-     tweetDivided.appendChild(anchor);
+// Enterキーで診断を実行
+userNameInput.onkeydown = (event) =>{
+  if(event.key === 'Enter'){
+    assessmentButton.onclick();
+  }
+}
 
-     twttr.widgets.load();
-    };
-
-    const answers = [
-        '{userName}のいいところは声です。{userName}の特徴的な声は皆を惹きつけ、心に残ります。',
-        '{userName}のいいところはまなざしです。{userName}に見つめられた人は、気になって仕方がないでしょう。',
-        '{userName}のいいところは情熱です。{userName}の情熱に周りの人は感化されます。',
-        '{userName}のいいところは厳しさです。{userName}の厳しさがものごとをいつも成功に導きます。',
-        '{userName}のいいところは知識です。博識な{userName}を多くの人が頼りにしています。',
-        '{userName}のいいところはユニークさです。{userName}だけのその特徴が皆を楽しくさせます。',
-        '{userName}のいいところは用心深さです。{userName}の洞察に、多くの人が助けられます。',
-        '{userName}のいいところは見た目です。内側から溢れ出る{userName}の良さに皆が気を惹かれます。',
-        '{userName}のいいところは決断力です。{userName}がする決断にいつも助けられる人がいます。',
-        '{userName}のいいところは思いやりです。{userName}に気をかけてもらった多くの人が感謝しています。',
-        '{userName}のいいところは感受性です。{userName}が感じたことに皆が共感し、わかりあうことができます。',
-        '{userName}のいいところは節度です。強引すぎない{userName}の考えに皆が感謝しています。',
-        '{userName}のいいところは好奇心です。新しいことに向かっていく{userName}の心構えが多くの人に魅力的に映ります。',
-        '{userName}のいいところは気配りです。{userName}の配慮が多くの人を救っています。',
-        '{userName}のいいところはその全てです。ありのままの{userName}自身がいいところなのです。',
-        '{userName}のいいところは自制心です。やばいと思ったときにしっかりと衝動を抑えられる{userName}が皆から評価されています。',
-        '{userName}のいいところは優しさです。{userName}の優しい雰囲気や立ち振る舞いに多くの人が癒されています。'
-    ];
-
-    /**
-  * 名前の文字列を渡すと診断結果を返す関数
-  * @param {string} userName ユーザーの名前 string型を入れる。
-  * @return {string} 診断結果　string型の診断結果を返してくれる。
-  */
-  /**これは 関数の内部の処理と、 外部から受ける出力や入力を定義している
-   * 内外の境界を表す定義（インタフェース）でJSDoc の記述方法という
-   * 複数行コメントアウトできる*/
-  function assessment(userName) {
-    // 全文字のコード番号を取得してそれを足し合わせる
-    let sumOfcharCode = 0;
-    for (let i = 0; i < userName.length; i++) {
-      sumOfcharCode = sumOfcharCode + userName.charCodeAt(i);
-    }
-    // 文字のコード番号の合計を回数の数で割って添字の数値を求める
-    const index = sumOfcharCode % answers.length;
-    let result = answers[index];
-
-    result = result.replace(/\{userName\}/g, userName);
-    return result;
-    }
-  
-    // テストコード
-  console.assert(
-    assessment('太郎') === '太郎のいいところは決断力です。太郎がする決断にいつも助けられる人がいます。',
-    '診断結果の文言の特定の部分を名前に置き換える処理が正しくありません。'
-  );
-  console.assert(
-    assessment('太郎') === assessment('太郎'),
-    '入力が同じ名前なら同じ診断結果を出力する処理が正しくありません。'
-  );
-})();
+console.assert = (
+  assessment('太郎') === '太郎のいいところは決断力です。太郎がする決断にいつも助けられる人がいます。', '間違い'
+);

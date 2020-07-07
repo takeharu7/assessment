@@ -1,19 +1,37 @@
 body{
-    background-color: #04A6EB;
-    color: #FDFFFF;
-    width: 500px;
-    margin-right: auto; 
-    margin-left: auto;
+  background-color: black;
+  width: 500px;
+  margin-left: auto;
+  margin-right: auto;
 }
-
+h1{
+  color: #ff0000;
+}
+h2{
+  color: #ff0033;
+}
+h3{
+  color: #ff0066;
+}
+h4{
+  color: #ff0099;
+}
+h5{
+  color: #ff00cc;
+}
+h6{
+  color: #ff00ff;
+}
+#q{
+  color: purple;
+}
 button{
-    padding: 5px 20px;
-    background-color: #337AB7;
-    color: #FDFFFF;
-    border-style: none;
+  padding: 5px 20px;
+  background-color: blueviolet;
+  border-style: none;
+  border-radius: 20px;
+  color: white;
 }
-
 input{
-    height: 20px;
-    border-radius: 20px;
+  height: 24px;
 }
